@@ -1,0 +1,54 @@
+version: "3.9"
+
+services:
+  mysql:
+    build: ./mysql
+    image: mysql
+    container_name: mysql_container
+    networks:
+      - db_network
+    volumes:
+      - db_volume:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: testdb
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "--password=rootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  app:
+    build: ./app
+    image: app
+    container_name: app_container
+    networks:
+      - db_network
+      - site_network
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4743/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  nginx:
+    build: ./nginx
+    image: nginx
+    container_name: nginx_container
+    networks:
+      - site_network
+    ports:
+      - "5423:824"
+    depends_on:
+      app:
+        condition: service_healthy
+
+networks:
+  db_network:
+  site_network:
+
+volumes:
+  db_volume:
