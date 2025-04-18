@@ -1,6 +1,6 @@
 version: "3.9"
 
-services:
+ervices:
   mysql:
     build: ./mysql
     image: mysql
@@ -9,6 +9,7 @@ services:
       - db_network
     volumes:
       - db_volume:/var/lib/mysql
+      - ./mysql/conf/init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: testdb

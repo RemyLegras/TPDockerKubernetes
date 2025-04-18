@@ -10,6 +10,7 @@ docker build -t nginx ./nginx
 
 docker run -d --name mysql_container --network db_network \
   --network-alias mysql -v db_volume:/var/lib/mysql \
+  -v ./mysql/conf/init.sql:/docker-entrypoint-initdb.d/init.sql \
   -e MYSQL_ROOT_PASSWORD=rootpassword -e MYSQL_DATABASE=testdb \
   -p 5655:3306 mysql
 
